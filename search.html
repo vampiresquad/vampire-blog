@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - Vampire's Media Hub</title>
+    <meta name="description" content="Search all posts on Vampire's Media Hub.">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .search-form {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 242, 234, 0.2);
+        }
+        #search-results {
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
+            <nav class="main-nav">
+                <a href="index.html">Home</a>
+                <a href="search.html" class="active">Search</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="page-header">
+            <h1>Search the Hub</h1>
+        </section>
+        
+        <section class="search-form">
+            <input type="search" id="search-input" class="search-input" placeholder="Type to search posts..." autocomplete="off">
+        </section>
+
+        <section class="post-grid" id="search-results">
+            <p style="text-align: center; grid-column: 1 / -1; color: var(--text-secondary);">Start typing to see results...</p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- কনফিগারেশন ---
+            const GITHUB_USERNAME = 'vampiresquad';
+            const GITHUB_REPONAME = 'vampire-blog';
+            const ALL_POSTS_CACHE = []; // সব পোস্ট ক্যাশে রাখার জন্য
+
+            // --- DOM এলিমেন্ট ---
+            const searchInput = document.getElementById('search-input');
+            const searchResultsContainer = document.getElementById('search-results');
+
+            /**
+             * GitHub API থেকে সব পোস্ট লোড করে ক্যাশে করে
+             */
+            async function loadAllPosts() {
+                // আমরা প্রথম ১০০টি পোস্ট নিচ্ছি। বড় সাইটের জন্য পেজিনেশন লাগবে।
+                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&sort=created&direction=desc&per_page=100`;
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error(`GitHub API Error: ${response.status}`);
+                    const issues = await response.json();
+                    ALL_POSTS_CACHE.push(...issues);
+                    console.log(`Loaded ${ALL_POSTS_CACHE.length} posts into cache.`);
+                } catch (error) {
+                    console.error('Error loading all posts for search:', error);
+                    searchResultsContainer.innerHTML = `<p style="text-align: center; color: #ff4d4d; grid-column: 1 / -1;">Could not load posts for search. ${error.message}</p>`;
+                }
+            }
+
+            /**
+             * সার্চ রেজাল্ট রেন্ডার করে
+             */
+            function renderResults(results) {
+                if (results.length === 0) {
+                    searchResultsContainer.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">No posts found matching your query.</p>';
+                    return;
+                }
+                
+                searchResultsContainer.innerHTML = ''; // আগের রেজাল্ট মুছে ফেলা
+                results.forEach(issue => {
+                    const postCard = createPostCard(issue);
+                    searchResultsContainer.insertAdjacentHTML('beforeend', postCard);
+                });
+            }
+
+            /**
+             * একটি পোস্ট কার্ডের HTML তৈরি করে (অন্যান্য পেজের মতো)
+             */
+            function createPostCard(issue) {
+                const postDate = new Date(issue.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                const snippet = issue.body ? issue.body.substring(0, 150) + '...' : 'No description available.';
+                let tagsHTML = '';
+                issue.labels.forEach(label => {
+                    const excludeLabels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid', 'question', 'wontfix'];
+                    if (!excludeLabels.includes(label.name.toLowerCase())) {
+                        tagsHTML += `<span class="post-tag" style="background-color: #${label.color}30; color: #${label.color};">${label.name}</span>`;
+                    }
+                });
+                return `
+                    <article class="post-card">
+                        <div class="post-card-content">
+                            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
+                            <div class="post-meta">Posted by ${issue.user.login} on ${postDate}</div>
+                            <div class="post-tags">${tagsHTML}</div>
+                            <p class="post-excerpt">${snippet}</p>
+                            <a href="post.html?id=${issue.number}" class="read-more">Read More →</a>
+                        </div>
+                    </article>
+                `;
+            }
+
+            /**
+             * ইনস্ট্যান্ট সার্চ লজিক
+             */
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                
+                if (query.length < 2) {
+                    searchResultsContainer.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-secondary);">Type at least 2 characters to search...</p>';
+                    return;
+                }
+
+                const filteredPosts = ALL_POSTS_CACHE.filter(post => {
+                    const titleMatch = post.title.toLowerCase().includes(query);
+                    const bodyMatch = post.body && post.body.toLowerCase().includes(query);
+                    return titleMatch || bodyMatch;
+                });
+
+                renderResults(filteredPosts);
+            });
+
+            // --- ইঞ্জিন চালু করা ---
+            loadAllPosts();
+        });
+    </script>
+</body>
+</html>
