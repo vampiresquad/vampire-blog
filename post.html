@@ -3,173 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category - Vampire's Media Hub</title>
-    <meta name="description" content="Browse posts by category on Vampire's Media Hub.">
+    <title>Vampire's Media Hub - Post</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* ইনফিনিট স্ক্রলের জন্য ফেড-ইন অ্যানিমেশন */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .post-card {
-            animation: fadeIn 0.5s ease-out;
-        }
-        /* লোডার সেন্টিনেল */
-        #loader-sentinel {
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-secondary);
-            grid-column: 1 / -1;
-        }
-    </style>
 </head>
 <body>
+
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress"></div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="nav-container">
             <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
             <nav class="main-nav">
                 <a href="index.html">Home</a>
-                <a href="search.html">Search</a>
                 <a href="about.html">About</a>
+                <a href="search.html">Search</a>
             </nav>
         </div>
     </header>
 
+    <!-- Main Container -->
     <main class="container">
         <section class="page-header">
-            <h1 id="category-title">Loading Category...</h1>
+            <h1 id="post-title">Loading...</h1>
         </section>
-        
-        <section class="post-grid" id="post-container">
-            <!-- স্কেলিটন লোডার প্রাথমিকভাবে দেখানো হবে -->
-            <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton skeleton-line h-20"></div><div class="skeleton skeleton-line h-12"></div><div class="skeleton skeleton-line h-16"></div><div class="skeleton skeleton-line h-16-75"></div><div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div></div></article>
-            <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton skeleton-line h-20"></div><div class="skeleton skeleton-line h-12"></div><div class="skeleton skeleton-line h-16"></div><div class="skeleton skeleton-line h-16-75"></div><div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div></div></article>
-            <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton skeleton-line h-20"></div><div class="skeleton skeleton-line h-12"></div><div class="skeleton skeleton-line h-16"></div><div class="skeleton skeleton-line h-16-75"></div><div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div></div></article>
+
+        <section id="post-content" class="post-grid">
+            <article class="skeleton-card">
+                <div class="skeleton-card-content">
+                    <div class="skeleton skeleton-line h-20"></div>
+                    <div class="skeleton skeleton-line h-12"></div>
+                    <div class="skeleton skeleton-line h-16"></div>
+                    <div class="skeleton skeleton-line h-16-75"></div>
+                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
+                </div>
+            </article>
         </section>
-        <div id="loader-sentinel">Loading more posts...</div>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
         <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
     </footer>
 
+    <!-- JS -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- কনফিগারেশন ---
+        document.addEventListener('DOMContentLoaded', () => {
             const GITHUB_USERNAME = 'vampiresquad';
             const GITHUB_REPONAME = 'vampire-blog';
-            const POSTS_PER_PAGE = 9;
+            const postContainer = document.getElementById('post-content');
+            const postTitle = document.getElementById('post-title');
+            const progressBar = document.getElementById('reading-progress');
 
-            // --- DOM এলিমেন্ট ---
-            const postContainer = document.getElementById('post-container');
-            const categoryTitle = document.getElementById('category-title');
-            const loaderSentinel = document.getElementById('loader-sentinel');
-
-            // --- স্টেট ম্যানেজমেন্ট ---
-            let currentPage = 1;
-            let isLoading = false;
-            let currentLabel = '';
-
-            // URL থেকে লেবেল পাওয়া
-            const urlParams = new URLSearchParams(window.location.search);
-            currentLabel = urlParams.get('label');
-
-            if (!currentLabel) {
-                postContainer.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">No category specified. Redirecting to home...</p>';
-                setTimeout(() => window.location.href = 'index.html', 2000);
+            // --- Get Issue ID from URL ---
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('id');
+            if(!postId){
+                postContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;">No post ID provided!</p>`;
                 return;
             }
 
-            // পেজের টাইটেল আপডেট করা
-            categoryTitle.textContent = `Posts in: ${currentLabel.charAt(0).toUpperCase() + currentLabel.slice(1)}`;
-            document.title = `${currentLabel.charAt(0).toUpperCase() + currentLabel.slice(1)} - Vampire's Media Hub`;
-
-            /**
-             * GitHub API থেকে পোস্ট লোড করে (পেজিনেশন সহ)
-             */
-            async function fetchPosts(page = 1) {
-                if (isLoading) return;
-                isLoading = true;
-                loaderSentinel.textContent = 'Loading more posts...';
-
-                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?labels=${currentLabel}&state=open&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}&page=${page}`;
-                
+            // --- Fetch Single Post ---
+            async function fetchPost() {
+                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues/${postId}`;
                 try {
                     const response = await fetch(apiUrl);
-                    if (!response.ok) throw new Error(`GitHub API Error: ${response.status}`);
-                    const issues = await response.json();
+                    if(!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+                    const post = await response.json();
 
-                    if (page === 1) {
-                        postContainer.innerHTML = ''; // প্রথম পেজে স্কেলিটন মুছে ফেলা
-                    }
-                    
-                    if (issues.length === 0 && page === 1) {
-                        postContainer.innerHTML = `<p style="text-align: center; grid-column: 1 / -1;">No posts found in this category.</p>`;
-                        loaderSentinel.style.display = 'none';
-                        return;
-                    }
-                    if (issues.length === 0 && page > 1) {
-                        loaderSentinel.textContent = 'No more posts to load.';
-                        return;
-                    }
+                    // Set Title
+                    postTitle.textContent = post.title;
 
-                    issues.forEach(issue => {
-                        const postCard = createPostCard(issue);
-                        postContainer.insertAdjacentHTML('beforeend', postCard);
+                    // Post Date & Author
+                    const postDate = new Date(post.created_at).toLocaleDateString('en-US', {
+                        year:'numeric', month:'long', day:'numeric'
                     });
+                    const metaHTML = `<div class="post-meta">Posted by ${post.user.login} on ${postDate}</div>`;
 
-                } catch (error) {
-                    console.error('Error fetching posts:', error);
-                    postContainer.innerHTML += `<p style="text-align: center; color: #ff4d4d; grid-column: 1 / -1;">Failed to load posts. ${error.message}</p>`;
-                } finally {
-                    isLoading = false;
+                    // Tags
+                    let tagsHTML = '';
+                    post.labels.forEach(label=>{
+                        const exclude = ['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'];
+                        if(!exclude.includes(label.name.toLowerCase())){
+                            tagsHTML += `<span class="post-tag" style="background-color:#${label.color}30;color:#${label.color};">${label.name}</span>`;
+                        }
+                    });
+                    tagsHTML = `<div class="post-tags">${tagsHTML}</div>`;
+
+                    // Body Content
+                    let bodyHTML = `<div class="post-body">${post.body.replace(/\n/g,'<br>')}</div>`;
+
+                    // Check for Tutorial Quiz
+                    if(post.labels.some(l=>l.name.toLowerCase()==='tutorial')){
+                        const quizHTML = parseQuiz(post.body);
+                        bodyHTML += quizHTML;
+                    }
+
+                    // Render Post
+                    postContainer.innerHTML = `
+                        <article class="post-card fade-in">
+                            <div class="post-card-content">
+                                ${metaHTML}
+                                ${tagsHTML}
+                                ${bodyHTML}
+                            </div>
+                        </article>
+                    `;
+
+                } catch(err){
+                    console.error('Error fetching post:', err);
+                    postContainer.innerHTML = `<p style="text-align:center;color:#ff4d4d;grid-column:1/-1;">Failed to load post. ${err.message}</p>`;
                 }
             }
 
-            /**
-             * একটি পোস্ট কার্ডের HTML তৈরি করে (index.html এর মতো)
-             */
-            function createPostCard(issue) {
-                const postDate = new Date(issue.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                const snippet = issue.body ? issue.body.substring(0, 150) + '...' : 'No description available.';
-                let tagsHTML = '';
-                issue.labels.forEach(label => {
-                    const excludeLabels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid', 'question', 'wontfix'];
-                    if (!excludeLabels.includes(label.name.toLowerCase())) {
-                        tagsHTML += `<span class="post-tag" style="background-color: #${label.color}30; color: #${label.color};">${label.name}</span>`;
+            // --- Parse Quiz --- 
+            function parseQuiz(body){
+                const quizStart = body.indexOf('---QUIZ---');
+                const quizEnd = body.indexOf('---ENDQUIZ---');
+                if(quizStart===-1 || quizEnd===-1) return '';
+                const quizContent = body.substring(quizStart + 10, quizEnd).trim();
+                const lines = quizContent.split('\n').filter(l=>l.trim()!=='');
+                let html = `<div class="quiz-container"><h3>Quiz</h3>`;
+                lines.forEach((line,i)=>{
+                    const [q,a] = line.split('||'); // Format: Question||Answer
+                    if(q && a){
+                        html += `
+                        <div class="quiz-question">
+                            <p>${i+1}. ${q.trim()}</p>
+                            <input type="text" class="quiz-input" data-answer="${a.trim()}">
+                            <button class="quiz-check">Check</button>
+                            <span class="quiz-result"></span>
+                        </div>`;
                     }
                 });
-                return `
-                    <article class="post-card">
-                        <div class="post-card-content">
-                            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
-                            <div class="post-meta">Posted by ${issue.user.login} on ${postDate}</div>
-                            <div class="post-tags">${tagsHTML}</div>
-                            <p class="post-excerpt">${snippet}</p>
-                            <a href="post.html?id=${issue.number}" class="read-more">Read More →</a>
-                        </div>
-                    </article>
-                `;
+                html += `</div>`;
+                return html;
             }
 
-            // --- ইনফিনিট স্ক্রল ইমপ্লিমেন্টেশন (Intersection Observer) ---
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && !isLoading) {
-                    currentPage++;
-                    fetchPosts(currentPage);
+            // --- Quiz Event Listener ---
+            document.addEventListener('click', e=>{
+                if(e.target.classList.contains('quiz-check')){
+                    const container = e.target.closest('.quiz-question');
+                    const input = container.querySelector('.quiz-input');
+                    const result = container.querySelector('.quiz-result');
+                    if(input.value.trim().toLowerCase() === input.dataset.answer.toLowerCase()){
+                        result.textContent = '✅ Correct!';
+                        result.style.color = 'var(--primary-color)';
+                    } else {
+                        result.textContent = '❌ Wrong!';
+                        result.style.color = '#ff4d4d';
+                    }
                 }
-            }, {
-                rootMargin: '100px' // লোডার ১০০px আগে দৃশ্যমান হলেই ট্রিগার হবে
             });
 
-            observer.observe(loaderSentinel);
+            // --- Reading Progress ---
+            window.addEventListener('scroll', ()=>{
+                const scrollTop = window.scrollY;
+                const docHeight = document.body.scrollHeight - window.innerHeight;
+                const scrolled = (scrollTop / docHeight) * 100;
+                progressBar.style.width = scrolled + "%";
+            });
 
-            // --- প্রথম ব্যাচ পোস্ট লোড করা ---
-            fetchPosts(1);
+            // --- Init ---
+            fetchPost();
         });
     </script>
+
+    <style>
+        /* Quiz Styles */
+        .quiz-container{
+            background: var(--card-background);
+            border:1px solid var(--border-color);
+            padding:1.5rem;
+            margin-top:1.5rem;
+            border-radius: var(--border-radius);
+        }
+        .quiz-question{
+            margin-bottom:1rem;
+        }
+        .quiz-input{
+            padding:0.5rem;
+            width:70%;
+            margin-right:0.5rem;
+            border-radius:6px;
+            border:1px solid var(--border-color);
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .quiz-check{
+            padding:0.5rem 1rem;
+            border:none;
+            background: var(--primary-color);
+            color:#0d1117;
+            font-weight:600;
+            border-radius:6px;
+            cursor:pointer;
+        }
+        .quiz-check:hover{
+            background: var(--secondary-color);
+        }
+        .quiz-result{
+            margin-left:1rem;
+            font-weight:600;
+        }
+
+        /* Fade-in Animation */
+        .fade-in{ animation: fadeInUp 0.6s ease forwards; opacity:0; }
+        @keyframes fadeInUp{
+            from{ transform: translateY(20px); opacity:0; }
+            to{ transform: translateY(0); opacity:1; }
+        }
+    </style>
+
 </body>
 </html>
