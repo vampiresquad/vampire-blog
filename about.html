@@ -3,70 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Vampire's Media Hub</title>
-    <meta name="description" content="Learn more about Vampire's Media Hub and its creator.">
+    <title>Vampire's Media Hub - About</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .about-content {
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 2rem 3rem;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        .about-content h1 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--heading-color); }
-        .about-content p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.5rem; }
-        .about-content a {
-            font-weight: 600;
-            color: var(--primary-color);
-            text-decoration: underline;
-            text-decoration-thickness: 2px;
-            text-underline-offset: 4px;
-        }
-        .about-content a:hover { color: var(--secondary-color); }
-    </style>
 </head>
 <body>
+
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress"></div>
+
+    <!-- Header -->
     <header class="site-header">
         <div class="nav-container">
             <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
             <nav class="main-nav">
                 <a href="index.html">Home</a>
-                <a href="search.html">Search</a>
                 <a href="about.html" class="active">About</a>
+                <a href="search.html">Search</a>
             </nav>
         </div>
     </header>
 
+    <!-- Main Container -->
     <main class="container">
-        <section class="about-content">
-            <h1>About Vampire's Media Hub</h1>
-            <p>
-                Welcome to the digital abyss. Vampire's Media Hub is not just a blog; it's a curated collection of thoughts, tutorials, and breakthroughs from the shadowy corners of the web and the bright frontiers of science.
-            </p>
-            <p>
-                This platform is a unique experiment, powered entirely by <strong>GitHub Pages</strong> and managed through <strong>GitHub Issues</strong> as a headless CMS. It's a testament to the power of modern web development and the open-source ethos.
-            </p>
-            <p>
-                The content here spans a wide spectrum—from deep dives into <strong>hacking</strong> and <strong>AI</strong> to philosophical musings and curated news. Every post is an issue, every category a label, making the entire site a living, breathing repository of knowledge.
-            </p>
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
-            <h2 style="font-size: 1.8rem; color: var(--secondary-color);">The Curator</h2>
-            <p>
-                This hub is maintained by <strong>Muhammad Shourov</strong>, a developer with a passion for exploring the intersection of technology, creativity, and critical thinking.
-            </p>
-            <p>
-                To see my professional work, projects, and other endeavors, visit my portfolio:
-            </p>
-            <p>
-                <a href="https://vampiresquad.github.io/Muhammad_Shourov/index.html" target="_blank" rel="noopener noreferrer">Muhammad_Shourov</a>
-            </p>
+        <section class="page-header">
+            <h1>About Me</h1>
+        </section>
+
+        <section class="post-grid fade-in">
+            <article class="post-card">
+                <div class="post-card-content">
+                    <p>Hello! I am <strong>Muhammad Shourov</strong>, founder of <strong>Vampire Squad</strong>. I am a cybersecurity enthusiast, ethical hacker, and tech content creator. This platform, <strong>Vampire's Media Hub</strong>, is my initiative to share knowledge across tech, science, education, news, entertainment, and personal thoughts — completely free and accessible to all.</p>
+
+                    <p>You can also check my professional portfolio and projects here: 
+                        <a href="https://vampiresquad.github.io/Muhammad_Shourov/index.html" target="_blank">Muhammad Shourov (GitHub)</a>
+                    </p>
+
+                    <p>Stay tuned for tutorials, news, tech insights, quizzes, and more. Explore, learn, and enjoy!</p>
+                </div>
+            </article>
         </section>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
         <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
     </footer>
+
+    <script>
+        // Reading Progress
+        const progressBar = document.getElementById('reading-progress');
+        window.addEventListener('scroll', ()=>{
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const scrolled = (scrollTop/docHeight)*100;
+            progressBar.style.width = scrolled + "%";
+        });
+    </script>
+
+    <style>
+        /* Fade-in Animation */
+        .fade-in{ animation: fadeInUp 0.6s ease forwards; opacity:0; }
+        @keyframes fadeInUp{
+            from{ transform: translateY(20px); opacity:0; }
+            to{ transform: translateY(0); opacity:1; }
+        }
+        a{
+            color: var(--primary-color);
+        }
+        a:hover{
+            color: var(--secondary-color);
+        }
+    </style>
+
 </body>
 </html>
