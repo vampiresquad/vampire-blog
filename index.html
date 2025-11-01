@@ -1,34 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Vampire's Media Hub - Home</title>
-    
     <meta name="description" content="Vampire's Media Hub - A collection of tech, science, news, entertainment, and personal thoughts.">
     <meta name="keywords" content="Vampire, Blog, Tech, Hacking, AI, News, Education, Philosophy">
     <script data-goatcounter="https://muhammadshourov.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
+    <!-- External stylesheet (আপনার style.css থাকলে তা ব্যবহার হবে) -->
     <link rel="stylesheet" href="style.css">
+
+    <style>
+      /* হালকা fallback styles — যদি style.css লোড না হয়, তবুও basic layout ঠিক থাকবে */
+      :root { --bg:#0b0d10; --card:#0f1114; --muted:#9aa0a6; --accent:#9b59b6; color-scheme: dark; }
+      body{ margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:var(--bg);color:#e6eef3; }
+      .container{ max-width:1100px;margin:2rem auto;padding:1rem; }
+      .nav-container{ display:flex;align-items:center;justify-content:space-between;padding:1rem 0; }
+      .logo{ font-weight:700;text-decoration:none;color:#fff;font-size:1.1rem }
+      .category-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:1rem; }
+      .category-card{ display:flex; align-items:center; justify-content:center; min-height:90px; text-decoration:none; border-radius:12px; background:#0e1113; color:#ddd; box-shadow:0 6px 18px rgba(0,0,0,0.6); padding:0.75rem; }
+      .page-header h1{ margin:0 0 1rem 0; font-size:1.5rem; color:#fff; }
+
+      .post-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-top:1rem; }
+      .post-card{ background:var(--card); border-radius:12px; padding:1rem; box-shadow:0 8px 24px rgba(0,0,0,0.6); }
+      .post-card h2{ margin:0 0 .5rem 0; font-size:1.05rem; }
+      .post-meta{ color:var(--muted); font-size:0.85rem; margin-bottom:.5rem; }
+      .post-tags { margin: .5rem 0; display:flex; gap:.5rem; flex-wrap:wrap; }
+      .post-tag{ font-size:0.75rem; padding:.25rem .5rem; border-radius:999px; background: rgba(155,89,182,0.08); color:#9b59b6; }
+
+      /* skeleton (fallback) */
+      .skeleton-card{ background:linear-gradient(90deg,#0f1113,#0c0d0f); border-radius:12px; padding:1rem; min-height:140px; }
+      .skeleton { background: linear-gradient(90deg,#0d0f11,#121416); border-radius:6px; height:1rem; margin:8px 0; opacity:.9; }
+      .skeleton.h-20{ height:1.25rem; width:70%; }
+      .skeleton.h-12{ height:.9rem; width:40%; }
+      .skeleton.h-16{ height:1rem; width:100%; }
+      .skeleton.h-16-75{ height:1rem; width:75%; }
+      .skeleton.h-16-50{ height:1rem; width:50%; }
+
+      .read-more{ display:inline-block;margin-top:0.5rem;text-decoration:none;font-weight:600;color:var(--accent); }
+      .site-footer{ text-align:center;padding:2rem 0;color:var(--muted);font-size:.9rem; }
+      a { color:inherit; }
+      .error { color:#ff6b6b;text-align:center; grid-column:1 / -1; }
+      .sr-only{ position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden; }
+    </style>
 </head>
 <body>
 
     <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
-            <nav class="main-nav">
+        <div class="nav-container container">
+            <a href="index.html" class="logo">Vampire<span style="opacity:.8">'s</span> Hub</a>
+            <nav class="main-nav" role="navigation" aria-label="Main">
                 <a href="index.html" class="active">Home</a>
-                </nav>
+                <a href="search.html">Search</a>
+                <a href="about.html">About</a>
+            </nav>
         </div>
     </header>
 
-    <main class="container">
+    <main class="container" id="main" role="main">
 
-        <section class="page-header">
+        <section class="page-header" aria-hidden="false">
             <h1>Browse by Category</h1>
         </section>
-        
-        <section class="category-grid">
+
+        <section class="category-grid" aria-label="Categories">
+            <!-- categories kept same as provided -->
             <a href="category.html?label=hacking" class="category-card"><h3>Hacking</h3></a>
             <a href="category.html?label=ai" class="category-card"><h3>AI</h3></a>
             <a href="category.html?label=science" class="category-card"><h3>Science</h3></a>
@@ -44,41 +81,43 @@
             <a href="category.html?label=philosophy" class="category-card"><h3>Philosophy</h3></a>
         </section>
 
-        <section class="page-header" style="margin-top: 3rem;">
+        <section class="page-header" style="margin-top: 2.5rem;">
             <h1>Latest Posts</h1>
         </section>
-        
-        <section class="post-grid" id="post-container">
-            
-            <article class="skeleton-card">
+
+        <section class="post-grid" id="post-container" aria-live="polite" aria-busy="true">
+            <!-- initial skeletons -->
+            <article class="skeleton-card" aria-hidden="true">
                 <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div>
+                    <div class="skeleton h-20"></div>
+                    <div class="skeleton h-12"></div>
+                    <div class="skeleton h-16"></div>
+                    <div class="skeleton h-16-75"></div>
+                    <div class="skeleton h-16-50" style="margin-top: 1rem;"></div>
                 </div>
             </article>
-            <article class="skeleton-card">
+            <article class="skeleton-card" aria-hidden="true">
                 <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div>
+                    <div class="skeleton h-20"></div>
+                    <div class="skeleton h-12"></div>
+                    <div class="skeleton h-16"></div>
+                    <div class="skeleton h-16-75"></div>
+                    <div class="skeleton h-16-50" style="margin-top: 1rem;"></div>
                 </div>
             </article>
-            <article class="skeleton-card">
+            <article class="skeleton-card" aria-hidden="true">
                 <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div>
+                    <div class="skeleton h-20"></div>
+                    <div class="skeleton h-12"></div>
+                    <div class="skeleton h-16"></div>
+                    <div class="skeleton h-16-75"></div>
+                    <div class="skeleton h-16-50" style="margin-top: 1rem;"></div>
                 </div>
             </article>
-            
         </section>
+
+        <!-- sentinel for infinite scroll -->
+        <div id="scroll-sentinel" style="height:1px;"></div>
 
     </main>
 
@@ -87,93 +126,223 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // --- কনফিগারেশন ---
-            const GITHUB_USERNAME = 'vampiresquad';
-            const GITHUB_REPONAME = 'vampire-blog';
-            const POSTS_PER_PAGE = 9; // হোমপেজে কতগুলো সর্বশেষ পোস্ট দেখাবে
+    (function(){
+        'use strict';
 
-            // --- DOM এলিমেন্ট ---
-            const postContainer = document.getElementById('post-container');
+        // ========== CONFIG ==========
+        const GITHUB_USERNAME = 'vampiresquad';
+        const GITHUB_REPONAME = 'vampire-blog';
+        const POSTS_PER_PAGE = 9;
+        const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
+        const MAX_PAGES = 20; // safety limit for infinite scroll
 
-            /**
-             * GitHub API থেকে পোস্ট লোড করে
-             */
-            async function fetchPosts() {
-                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}`;
-                
-                try {
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) {
-                        throw new Error(`GitHub API Error: ${response.status} ${response.statusText}`);
-                    }
-                    const issues = await response.json();
-                    
-                    // পোস্ট লোড হওয়ার পর স্কেলিটনগুলো সরিয়ে ফেলে
-                    postContainer.innerHTML = ''; 
-                    
-                    if (issues.length === 0) {
-                        postContainer.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">No posts found yet. Create a new Issue in the repository to get started!</p>';
-                        return;
-                    }
+        // If you want higher rate limits, create a GitHub Personal Access Token (no scopes needed for public repo read)
+        // and paste it below in place of null (NOT recommended to commit token — instead use GH Action / deploy secret).
+        // const GITHUB_TOKEN = 'ghp_XXXX';
+        const GITHUB_TOKEN = null;
 
-                    // প্রতিটি পোস্টের জন্য কার্ড তৈরি করে
-                    issues.forEach(issue => {
-                        const postCard = createPostCard(issue);
-                        postContainer.innerHTML += postCard;
-                    });
+        // DOM
+        const postContainer = document.getElementById('post-container');
+        const sentinel = document.getElementById('scroll-sentinel');
 
-                } catch (error) {
-                    console.error('Error fetching posts:', error);
-                    postContainer.innerHTML = `<p style="text-align: center; color: #ff4d4d; grid-column: 1 / -1;">Failed to load posts. ${error.message}</p>`;
+        // state
+        let currentPage = 1;
+        let loading = false;
+        let reachedEnd = false;
+
+        // small utility: escape HTML for safe insertion
+        function escapeHTML(str){
+            if(!str) return '';
+            return String(str).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+        }
+
+        // strip QUIZ block and markdown-ish basic cleanup for snippet
+        function createSnippet(body, maxLen = 180){
+            if(!body) return 'No description available.';
+            // remove QUIZ block
+            const noQuiz = body.replace(/---QUIZ---[\s\S]*?---ENDQUIZ---/gi, '');
+            // remove markdown links/images/codeblocks
+            let plain = noQuiz.replace(/!\[[^\]]*\]\([^\)]+\)/g, '') // images
+                              .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // links to text
+                              .replace(/```[\s\S]*?```/g, '') // codeblocks
+                              .replace(/`[^`]*`/g, '') // inline code
+                              .replace(/[#>*\-]{1,}\s?/g, '') // headings / list markers
+                              .replace(/\r?\n+/g, ' ') // newlines
+                              .trim();
+            // collapse multiple spaces
+            plain = plain.replace(/\s{2,}/g, ' ');
+            if(plain.length <= maxLen) return escapeHTML(plain);
+            return escapeHTML(plain.slice(0, maxLen).trim()) + '...';
+        }
+
+        // localStorage cache helpers
+        function cacheKey(page){
+            return `vampire_posts_${GITHUB_USERNAME}_${GITHUB_REPONAME}_p${page}`;
+        }
+        function saveCache(page, data){
+            try{
+                const payload = { ts: Date.now(), data };
+                localStorage.setItem(cacheKey(page), JSON.stringify(payload));
+            }catch(e){ /* ignore */ }
+        }
+        function loadCache(page){
+            try{
+                const raw = localStorage.getItem(cacheKey(page));
+                if(!raw) return null;
+                const parsed = JSON.parse(raw);
+                if(Date.now() - parsed.ts > CACHE_TTL_MS) {
+                    localStorage.removeItem(cacheKey(page));
+                    return null;
+                }
+                return parsed.data;
+            }catch(e){ return null; }
+        }
+
+        // fetch with optional token and error handling
+        async function ghFetch(url){
+            const headers = { Accept: 'application/vnd.github.v3+json' };
+            if(GITHUB_TOKEN) headers.Authorization = `token ${GITHUB_TOKEN}`;
+            const resp = await fetch(url, { headers });
+            // rate-limit check
+            if(resp.status === 403){
+                const remaining = resp.headers.get('x-ratelimit-remaining');
+                if(remaining === '0'){
+                    const reset = resp.headers.get('x-ratelimit-reset');
+                    const resetDate = reset ? new Date(parseInt(reset,10)*1000) : null;
+                    throw new Error(`GitHub rate limit exceeded. Try again after ${resetDate ? resetDate.toLocaleString() : 'some time'}. Consider using a personal access token for higher limits.`);
                 }
             }
+            if(!resp.ok) throw new Error(`GitHub API Error: ${resp.status} ${resp.statusText}`);
+            return resp.json();
+        }
 
-            /**
-             * একটি পোস্ট কার্ডের HTML তৈরি করে
-             */
-            function createPostCard(issue) {
-                // তারিখ ইংরেজিতে ফরম্যাট করা
-                const postDate = new Date(issue.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                
-                // পোস্টের বডি থেকে একটি ছোট সারসংক্ষেপ তৈরি করা
-                const snippet = issue.body ? issue.body.substring(0, 150) + '...' : 'No description available.';
+        // render a single issue -> card element
+        function renderPost(issue){
+            const title = escapeHTML(issue.title || 'Untitled');
+            const postDate = new Date(issue.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+            const snippet = createSnippet(issue.body, 220);
 
-                // লেবেলগুলো (ক্যাটাগরি) তৈরি করা
-                let tagsHTML = '';
-                issue.labels.forEach(label => {
-                    // GitHub-এর ডিফল্ট 'bug', 'documentation' ইত্যাদি লেবেল বাদ দেওয়া
-                    const excludeLabels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid', 'question', 'wontfix'];
-                    if (!excludeLabels.includes(label.name.toLowerCase())) {
-                        tagsHTML += `<span class="post-tag" style="background-color: #${label.color}30; color: #${label.color};">${label.name}</span>`;
-                    }
-                });
+            // build tags HTML safely
+            let tagsHTML = '';
+            const excludeLabels = ['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'];
+            (issue.labels || []).forEach(label => {
+                const name = escapeHTML(label.name || '');
+                const color = (label.color || '6b7280').replace(/^#/, '');
+                const bg = `#${color}33`; // translucent bg
+                // inline style used — fine for labels; you can move to CSS classes if preferred
+                tagsHTML += `<span class="post-tag" style="background-color:${bg}; color:#${color};">${name}</span>`;
+            });
 
-                // সম্পূর্ণ HTML কার্ড
-                return `
-                    <article class="post-card">
-                        <div class="post-card-content">
-                            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
-                            <div class="post-meta">
-                                Posted by ${issue.user.login} on ${postDate}
-                            </div>
-                            <div class="post-tags">${tagsHTML}</div>
-                            <p class="post-excerpt">${snippet}</p>
-                            <a href="post.html?id=${issue.number}" class="read-more">Read More →</a>
-                        </div>
-                    </article>
-                `;
+            // create container element (so we keep XSS-safe; using DOM methods)
+            const article = document.createElement('article');
+            article.className = 'post-card';
+            const inner = `
+                <div class="post-card-content">
+                    <h2><a href="post.html?id=${encodeURIComponent(issue.number)}">${title}</a></h2>
+                    <div class="post-meta">Posted by ${escapeHTML(issue.user.login)} on ${postDate}</div>
+                    <div class="post-tags">${tagsHTML}</div>
+                    <p class="post-excerpt">${snippet}</p>
+                    <a class="read-more" href="post.html?id=${encodeURIComponent(issue.number)}">Read More →</a>
+                </div>
+            `;
+            article.innerHTML = inner;
+            return article;
+        }
+
+        // append an array of issues to DOM
+        function appendPosts(issues){
+            if(!Array.isArray(issues) || issues.length === 0){
+                if(currentPage === 1){
+                    postContainer.innerHTML = '<p style="text-align:center; grid-column:1 / -1;">No posts yet. Create an Issue in the repository to get started.</p>';
+                }
+                reachedEnd = true;
+                return;
+            }
+            // remove skeletons on first append
+            const skeletons = postContainer.querySelectorAll('.skeleton-card');
+            if(skeletons.length) skeletons.forEach(s => s.remove());
+
+            issues.forEach(issue => {
+                // skip issues that only have default labels
+                const card = renderPost(issue);
+                postContainer.appendChild(card);
+            });
+        }
+
+        // main fetch function with pagination & caching
+        async function fetchPosts(page = 1){
+            if(loading || reachedEnd) return;
+            loading = true;
+            postContainer.setAttribute('aria-busy','true');
+
+            // check cache first
+            const cached = loadCache(page);
+            if(cached){
+                appendPosts(cached);
+                loading = false;
+                postContainer.setAttribute('aria-busy','false');
+                return;
             }
 
-            // --- ইঞ্জিন চালু করা ---
-            fetchPosts();
-        });
-    </script>
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}&page=${page}`;
 
+            try{
+                const issues = await ghFetch(apiUrl);
+                // store in cache
+                saveCache(page, issues);
+                appendPosts(issues);
+                // if less than requested per_page, we've reached end
+                if(!issues || issues.length < POSTS_PER_PAGE) reachedEnd = true;
+            }catch(err){
+                console.error('Error fetching posts:', err);
+                postContainer.innerHTML = `<p class="error">Failed to load posts. ${escapeHTML(err.message)}</p>`;
+                reachedEnd = true;
+            }finally{
+                loading = false;
+                postContainer.setAttribute('aria-busy','false');
+            }
+        }
+
+        // infinite scroll via IntersectionObserver
+        function setupInfiniteScroll(){
+            if(!('IntersectionObserver' in window)) {
+                // fallback: load one more page on scroll near bottom
+                window.addEventListener('scroll', () => {
+                    if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
+                        if(!loading && !reachedEnd && currentPage < MAX_PAGES){
+                            currentPage++;
+                            fetchPosts(currentPage);
+                        }
+                    }
+                });
+                return;
+            }
+            const io = new IntersectionObserver((entries) => {
+                for(const ent of entries){
+                    if(ent.isIntersecting && !loading && !reachedEnd && currentPage < MAX_PAGES){
+                        currentPage++;
+                        fetchPosts(currentPage);
+                    }
+                }
+            }, { root: null, rootMargin: '300px', threshold: 0.01 });
+            io.observe(sentinel);
+        }
+
+        // init
+        function init(){
+            fetchPosts(currentPage);
+            setupInfiniteScroll();
+        }
+
+        // start
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Expose small helper for debugging in console
+        window.__VAMPIRE_HUB = {
+            fetchPosts, renderPost
+        };
+
+    })();
+    </script>
 </body>
 </html>
