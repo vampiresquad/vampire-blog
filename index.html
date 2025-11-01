@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vampire's Media Hub - Home</title>
+    
+    <meta name="description" content="Vampire's Media Hub - A collection of tech, science, news, entertainment, and personal thoughts.">
+    <meta name="keywords" content="Vampire, Blog, Tech, Hacking, AI, News, Education, Philosophy">
+    <script data-goatcounter="https://muhammadshourov.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
+            <nav class="main-nav">
+                <a href="index.html" class="active">Home</a>
+                </nav>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="page-header">
+            <h1>Browse by Category</h1>
+        </section>
+        
+        <section class="category-grid">
+            <a href="category.html?label=hacking" class="category-card"><h3>Hacking</h3></a>
+            <a href="category.html?label=ai" class="category-card"><h3>AI</h3></a>
+            <a href="category.html?label=science" class="category-card"><h3>Science</h3></a>
+            <a href="category.html?label=tutorial" class="category-card"><h3>Tutorials</h3></a>
+            <a href="category.html?label=education" class="category-card"><h3>Education</h3></a>
+            <a href="category.html?label=news-world" class="category-card"><h3>World News</h3></a>
+            <a href="category.html?label=news-country" class="category-card"><h3>Country News</h3></a>
+            <a href="category.html?label=movies" class="category-card"><h3>Movies</h3></a>
+            <a href="category.html?label=music" class="category-card"><h3>Music</h3></a>
+            <a href="category.html?label=games" class="category-card"><h3>Games</h3></a>
+            <a href="category.html?label=personal" class="category-card"><h3>Personal Blog</h3></a>
+            <a href="category.html?label=religious" class="category-card"><h3>Religious</h3></a>
+            <a href="category.html?label=philosophy" class="category-card"><h3>Philosophy</h3></a>
+        </section>
+
+        <section class="page-header" style="margin-top: 3rem;">
+            <h1>Latest Posts</h1>
+        </section>
+        
+        <section class="post-grid" id="post-container">
+            
+            <article class="skeleton-card">
+                <div class="skeleton-card-content">
+                    <div class="skeleton skeleton-line h-20"></div>
+                    <div class="skeleton skeleton-line h-12"></div>
+                    <div class="skeleton skeleton-line h-16"></div>
+                    <div class="skeleton skeleton-line h-16-75"></div>
+                    <div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div>
+                </div>
+            </article>
+            <article class="skeleton-card">
+                <div class="skeleton-card-content">
+                    <div class="skeleton skeleton-line h-20"></div>
+                    <div class="skeleton skeleton-line h-12"></div>
+                    <div class="skeleton skeleton-line h-16"></div>
+                    <div class="skeleton skeleton-line h-16-75"></div>
+                    <div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div>
+                </div>
+            </article>
+            <article class="skeleton-card">
+                <div class="skeleton-card-content">
+                    <div class="skeleton skeleton-line h-20"></div>
+                    <div class="skeleton skeleton-line h-12"></div>
+                    <div class="skeleton skeleton-line h-16"></div>
+                    <div class="skeleton skeleton-line h-16-75"></div>
+                    <div class="skeleton skeleton-line h-16-50" style="margin-top: 1rem;"></div>
+                </div>
+            </article>
+            
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- কনফিগারেশন ---
+            const GITHUB_USERNAME = 'vampiresquad';
+            const GITHUB_REPONAME = 'vampire-blog';
+            const POSTS_PER_PAGE = 9; // হোমপেজে কতগুলো সর্বশেষ পোস্ট দেখাবে
+
+            // --- DOM এলিমেন্ট ---
+            const postContainer = document.getElementById('post-container');
+
+            /**
+             * GitHub API থেকে পোস্ট লোড করে
+             */
+            async function fetchPosts() {
+                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}`;
+                
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) {
+                        throw new Error(`GitHub API Error: ${response.status} ${response.statusText}`);
+                    }
+                    const issues = await response.json();
+                    
+                    // পোস্ট লোড হওয়ার পর স্কেলিটনগুলো সরিয়ে ফেলে
+                    postContainer.innerHTML = ''; 
+                    
+                    if (issues.length === 0) {
+                        postContainer.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">No posts found yet. Create a new Issue in the repository to get started!</p>';
+                        return;
+                    }
+
+                    // প্রতিটি পোস্টের জন্য কার্ড তৈরি করে
+                    issues.forEach(issue => {
+                        const postCard = createPostCard(issue);
+                        postContainer.innerHTML += postCard;
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching posts:', error);
+                    postContainer.innerHTML = `<p style="text-align: center; color: #ff4d4d; grid-column: 1 / -1;">Failed to load posts. ${error.message}</p>`;
+                }
+            }
+
+            /**
+             * একটি পোস্ট কার্ডের HTML তৈরি করে
+             */
+            function createPostCard(issue) {
+                // তারিখ ইংরেজিতে ফরম্যাট করা
+                const postDate = new Date(issue.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // পোস্টের বডি থেকে একটি ছোট সারসংক্ষেপ তৈরি করা
+                const snippet = issue.body ? issue.body.substring(0, 150) + '...' : 'No description available.';
+
+                // লেবেলগুলো (ক্যাটাগরি) তৈরি করা
+                let tagsHTML = '';
+                issue.labels.forEach(label => {
+                    // GitHub-এর ডিফল্ট 'bug', 'documentation' ইত্যাদি লেবেল বাদ দেওয়া
+                    const excludeLabels = ['bug', 'documentation', 'duplicate', 'enhancement', 'good first issue', 'help wanted', 'invalid', 'question', 'wontfix'];
+                    if (!excludeLabels.includes(label.name.toLowerCase())) {
+                        tagsHTML += `<span class="post-tag" style="background-color: #${label.color}30; color: #${label.color};">${label.name}</span>`;
+                    }
+                });
+
+                // সম্পূর্ণ HTML কার্ড
+                return `
+                    <article class="post-card">
+                        <div class="post-card-content">
+                            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
+                            <div class="post-meta">
+                                Posted by ${issue.user.login} on ${postDate}
+                            </div>
+                            <div class="post-tags">${tagsHTML}</div>
+                            <p class="post-excerpt">${snippet}</p>
+                            <a href="post.html?id=${issue.number}" class="read-more">Read More →</a>
+                        </div>
+                    </article>
+                `;
+            }
+
+            // --- ইঞ্জিন চালু করা ---
+            fetchPosts();
+        });
+    </script>
+
+</body>
+</html>
