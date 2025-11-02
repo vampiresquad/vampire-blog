@@ -1,79 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampire's Media Hub - About</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>About - Vampire's Media Hub</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="reading-progress"></div>
+  <header class="site-header">
+    <div class="container nav-container">
+      <a class="logo" href="index.html">Vampire<span>'s</span> Hub</a>
+      <nav class="main-nav"><a href="index.html">Home</a><a href="about.html" class="active">About</a><a href="search.html">Search</a></nav>
+    </div>
+  </header>
 
-    <!-- Reading Progress Bar -->
-    <div id="reading-progress"></div>
-
-    <!-- Header -->
-    <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
-            <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="about.html" class="active">About</a>
-                <a href="search.html">Search</a>
-            </nav>
+  <main class="container">
+    <section class="page-header"><h1>About Me</h1></section>
+    <section class="post-grid fade-in">
+      <article class="post-card">
+        <div class="post-card-content">
+          <p>Hello — I am <strong>Muhammad Shourov</strong> (Vampire). I build cybersecurity tools, tutorials and run Vampire Squad — a hacking & security learning initiative. This hub is built to share practical tutorials, curated news, and interactive quizzes — all free.</p>
+          <p>Portfolio: <a href="https://vampiresquad.github.io/Muhammad_Shourov/index.html" target="_blank">https://vampiresquad.github.io/Muhammad_Shourov/index.html</a></p>
+          <p>If you want to contribute: open an Issue in the repo, label it appropriately (tutorial, news-world, hacking, etc.) and your post will appear here automatically.</p>
         </div>
-    </header>
+      </article>
+    </section>
+  </main>
 
-    <!-- Main Container -->
-    <main class="container">
-        <section class="page-header">
-            <h1>About Me</h1>
-        </section>
+  <footer class="site-footer"><p>&copy; 2025 Vampire's Media Hub</p></footer>
 
-        <section class="post-grid fade-in">
-            <article class="post-card">
-                <div class="post-card-content">
-                    <p>Hello! I am <strong>Muhammad Shourov</strong>, founder of <strong>Vampire Squad</strong>. I am a cybersecurity enthusiast, ethical hacker, and tech content creator. This platform, <strong>Vampire's Media Hub</strong>, is my initiative to share knowledge across tech, science, education, news, entertainment, and personal thoughts — completely free and accessible to all.</p>
-
-                    <p>You can also check my professional portfolio and projects here: 
-                        <a href="https://vampiresquad.github.io/Muhammad_Shourov/index.html" target="_blank">Muhammad Shourov (GitHub)</a>
-                    </p>
-
-                    <p>Stay tuned for tutorials, news, tech insights, quizzes, and more. Explore, learn, and enjoy!</p>
-                </div>
-            </article>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="site-footer">
-        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
-    </footer>
-
-    <script>
-        // Reading Progress
-        const progressBar = document.getElementById('reading-progress');
-        window.addEventListener('scroll', ()=>{
-            const scrollTop = window.scrollY;
-            const docHeight = document.body.scrollHeight - window.innerHeight;
-            const scrolled = (scrollTop/docHeight)*100;
-            progressBar.style.width = scrolled + "%";
-        });
-    </script>
-
-    <style>
-        /* Fade-in Animation */
-        .fade-in{ animation: fadeInUp 0.6s ease forwards; opacity:0; }
-        @keyframes fadeInUp{
-            from{ transform: translateY(20px); opacity:0; }
-            to{ transform: translateY(0); opacity:1; }
-        }
-        a{
-            color: var(--primary-color);
-        }
-        a:hover{
-            color: var(--secondary-color);
-        }
-    </style>
-
+<script>
+window.addEventListener('scroll', ()=> {
+  const total = document.body.scrollHeight - window.innerHeight;
+  const pct = (window.scrollY/total)*100;
+  document.getElementById('reading-progress').style.width = pct + '%';
+});
+</script>
 </body>
-</html>
+</html>                    
