@@ -1,150 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampire's Media Hub - Search</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Vampire's Media Hub - Search</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="reading-progress"></div>
+  <header class="site-header">
+    <div class="container nav-container">
+      <a class="logo" href="index.html">Vampire<span>'s</span> Hub</a>
+      <nav class="main-nav"><a href="index.html">Home</a><a href="search.html" class="active">Search</a><a href="about.html">About</a></nav>
+    </div>
+  </header>
 
-    <!-- Reading Progress Bar -->
-    <div id="reading-progress"></div>
+  <main class="container">
+    <section class="page-header"><h1>Search Posts</h1></section>
+    <div style="text-align:center;margin:16px 0">
+      <input id="search-input" placeholder="Type to search title, body or label..." style="width:80%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)">
+    </div>
+    <section class="post-grid" id="results">
+      <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton-line h-20 skeleton"></div></div></article>
+      <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton-line h-20 skeleton"></div></div></article>
+    </section>
+  </main>
 
-    <!-- Header -->
-    <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
-            <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="search.html" class="active">Search</a>
-            </nav>
-        </div>
-    </header>
+  <footer class="site-footer"><p>&copy; 2025 Vampire's Media Hub</p></footer>
 
-    <!-- Main Container -->
-    <main class="container">
-        <section class="page-header">
-            <h1>Search Posts</h1>
-        </section>
+<script>
+(async function(){
+  const GITHUB_USERNAME='vampiresquad';
+  const GITHUB_REPONAME='vampire-blog';
+  const results = document.getElementById('results');
+  const input = document.getElementById('search-input');
+  let posts=[];
 
-        <section class="search-bar" style="text-align:center; margin-bottom:2rem;">
-            <input type="text" id="search-input" placeholder="Type to search posts..." style="width:70%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background: var(--card-background); color: var(--text-color);">
-        </section>
+  async function load(){
+    try{
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&per_page=100`);
+      const data = await res.json();
+      posts = Array.isArray(data) ? data : [];
+      render(posts);
+    }catch(e){ console.error(e); results.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#ff6b6b">Failed to load posts.</p>' }
+  }
 
-        <section class="post-grid" id="post-container">
-            <!-- Skeleton Loader -->
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                </div>
-            </article>
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                </div>
-            </article>
-        </section>
-    </main>
+  function render(list){
+    if(!list || list.length===0){ results.innerHTML = '<p style="grid-column:1/-1;text-align:center">No posts found.</p>'; return; }
+    results.innerHTML = '';
+    list.forEach(post=>{
+      const date = new Date(post.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+      const snippet = (post.body||'').slice(0,140).replace(/\n/g,' ') + '...';
+      let tags='';
+      (post.labels||[]).forEach(l=>{ if(!['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'].includes(l.name.toLowerCase())) tags += `<span class="post-tag">${l.name}</span>`});
+      const el = document.createElement('div');
+      el.innerHTML = `<article class="post-card fade-in"><div class="post-card-content"><h2><a href="post.html?id=${post.number}">${post.title}</a></h2><div class="post-meta">${date} • ${post.user.login}</div><div class="post-tags">${tags}</div><p class="post-excerpt">${snippet}</p><a class="read-more" href="post.html?id=${post.number}">Read More →</a></div></article>`;
+      results.appendChild(el.firstElementChild);
+    });
+  }
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
-    </footer>
+  input.addEventListener('input', ()=> {
+    const q = input.value.trim().toLowerCase();
+    if(!q) return render(posts);
+    const filtered = posts.filter(p=>{
+      const txt = (p.title + ' ' + (p.body||'') + ' ' + (p.labels||[]).map(l=>l.name).join(' ')).toLowerCase();
+      return txt.includes(q);
+    });
+    render(filtered);
+  });
 
-    <!-- JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', ()=>{
-            const GITHUB_USERNAME = 'vampiresquad';
-            const GITHUB_REPONAME = 'vampire-blog';
-            const postContainer = document.getElementById('post-container');
-            const searchInput = document.getElementById('search-input');
+  // progress
+  window.addEventListener('scroll', ()=> {
+    const total = document.body.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY/total)*100;
+    document.getElementById('reading-progress').style.width = pct + '%';
+  });
 
-            let allPosts = [];
-
-            // --- Fetch all posts ---
-            async function fetchAllPosts(){
-                try{
-                    const response = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&per_page=100`);
-                    if(!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-                    const posts = await response.json();
-                    allPosts = posts;
-                    renderPosts(posts);
-                }catch(err){
-                    console.error('Error fetching posts:', err);
-                    postContainer.innerHTML = `<p style="text-align:center;color:#ff4d4d;">Failed to load posts. ${err.message}</p>`;
-                }
-            }
-
-            // --- Render Posts ---
-            function renderPosts(posts){
-                if(posts.length===0){
-                    postContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;">No posts found.</p>`;
-                    return;
-                }
-                postContainer.innerHTML = '';
-                posts.forEach(post=>{
-                    const postDate = new Date(post.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-                    let tagsHTML = '';
-                    post.labels.forEach(label=>{
-                        const exclude = ['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'];
-                        if(!exclude.includes(label.name.toLowerCase())){
-                            tagsHTML += `<span class="post-tag" style="background-color:#${label.color}30;color:#${label.color};">${label.name}</span>`;
-                        }
-                    });
-                    const snippet = post.body ? post.body.substring(0,150)+'...' : 'No description available.';
-                    const postCard = document.createElement('div');
-                    postCard.innerHTML = `
-                        <article class="post-card fade-in">
-                            <div class="post-card-content">
-                                <h2><a href="post.html?id=${post.number}">${post.title}</a></h2>
-                                <div class="post-meta">Posted by ${post.user.login} on ${postDate}</div>
-                                <div class="post-tags">${tagsHTML}</div>
-                                <p class="post-excerpt">${snippet}</p>
-                                <a href="post.html?id=${post.number}" class="read-more">Read More →</a>
-                            </div>
-                        </article>
-                    `;
-                    postContainer.appendChild(postCard.firstElementChild);
-                });
-            }
-
-            // --- Search Functionality ---
-            searchInput.addEventListener('input', ()=>{
-                const query = searchInput.value.toLowerCase();
-                const filtered = allPosts.filter(post=>{
-                    return post.title.toLowerCase().includes(query) || (post.body && post.body.toLowerCase().includes(query));
-                });
-                renderPosts(filtered);
-            });
-
-            // --- Reading Progress ---
-            const progressBar = document.getElementById('reading-progress');
-            window.addEventListener('scroll', ()=>{
-                const scrollTop = window.scrollY;
-                const docHeight = document.body.scrollHeight - window.innerHeight;
-                const scrolled = (scrollTop/docHeight)*100;
-                progressBar.style.width = scrolled + "%";
-            });
-
-            // --- Init ---
-            fetchAllPosts();
-        });
-    </script>
-
-    <style>
-        /* Fade-in Animation */
-        .fade-in{ animation: fadeInUp 0.6s ease forwards; opacity:0; }
-        @keyframes fadeInUp{
-            from{ transform: translateY(20px); opacity:0; }
-            to{ transform: translateY(0); opacity:1; }
-        }
-    </style>
-
+  load();
+})();
+</script>
 </body>
 </html>
