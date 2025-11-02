@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Embed Reader - Vampire</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .embed-controls{max-width:1100px;margin:28px auto;text-align:center}
+    input[type=url]{width:72%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+    button{padding:10px 14px;border-radius:8px;border:none;background:var(--primary-color);color:#0d1117;font-weight:700;cursor:pointer}
+    .frame-wrap{max-width:1100px;margin:18px auto;padding:12px}
+    iframe{width:100%;height:78vh;border-radius:10px;border:1px solid var(--border)}
+  </style>
+</head>
+<body>
+  <header class="site-header"><div class="container nav-container"><a class="logo" href="../index.html">Vampire<span>'s</span> Hub</a></div></header>
+  <div class="embed-controls">
+    <h2>Quick Embed Reader</h2>
+    <input id="url" type="url" placeholder="Paste article URL (https://...)"/>
+    <button id="load">Load</button>
+    <p style="color:var(--muted)">If the site blocks embedding, use the Admin fetch (GitHub Action) to fetch content server-side.</p>
+  </div>
+  <div class="frame-wrap" id="frameWrap"></div>
+
+<script>
+document.getElementById('load').addEventListener('click', ()=>{
+  const u = document.getElementById('url').value.trim();
+  if(!u) return alert('Paste a valid URL');
+  try{ new URL(u) }catch(e){ return alert('Invalid URL') }
+  document.getElementById('frameWrap').innerHTML = `<iframe src="${u}"></iframe>`;
+});
+</script>
+</body>
+</html>
