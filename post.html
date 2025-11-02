@@ -1,220 +1,240 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampire's Media Hub - Post</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Vampire's Media Hub - Post</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="reading-progress"></div>
 
-    <!-- Reading Progress Bar -->
-    <div id="reading-progress"></div>
+  <header class="site-header">
+    <div class="container nav-container">
+      <a class="logo" href="index.html">Vampire<span>'s</span> Hub</a>
+      <nav class="main-nav"><a href="index.html">Home</a><a href="search.html">Search</a><a href="about.html">About</a></nav>
+    </div>
+  </header>
 
-    <!-- Header -->
-    <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
-            <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="search.html">Search</a>
-            </nav>
+  <main class="container">
+    <section class="page-header"><h1 id="post-title">Loading...</h1></section>
+    <section id="post-area" class="post-grid">
+      <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton-line h-20 skeleton"></div><div class="skeleton-line h-12 skeleton"></div></div></article>
+    </section>
+  </main>
+
+  <footer class="site-footer"><p>&copy; 2025 Vampire's Media Hub</p></footer>
+
+<script>
+(function(){
+  const GITHUB_USERNAME='vampiresquad';
+  const GITHUB_REPONAME='vampire-blog';
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const area = document.getElementById('post-area');
+  const titleEl = document.getElementById('post-title');
+
+  if(!id){ area.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#ff6b6b">No post id provided</p>'; throw new Error('No id'); }
+
+  async function fetchPost(){
+    try{
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues/${id}`);
+      if(!res.ok) throw new Error(res.statusText);
+      const issue = await res.json();
+      render(issue);
+    }catch(err){
+      console.error(err);
+      area.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#ff6b6b">Failed to load post.</p>`;
+    }
+  }
+
+  function render(issue){
+    titleEl.textContent = issue.title;
+    const date = new Date(issue.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    let tagsHTML = '';
+    (issue.labels||[]).forEach(l=>{
+      if(!['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'].includes(l.name.toLowerCase())) tagsHTML += `<span class="post-tag">${l.name}</span>`;
+    });
+
+    // Build body: convert basic newlines to paragraphs
+    const bodyHtml = (issue.body || '').split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+
+    const content = `
+      <article class="post-card">
+        <div class="post-card-content">
+          <div class="post-meta">Posted by ${issue.user.login} • ${date}</div>
+          <div class="post-tags">${tagsHTML}</div>
+          <div class="post-body">${bodyHtml}</div>
         </div>
-    </header>
+      </article>
+    `;
+    area.innerHTML = content + `<div id="quiz-wrapper"></div><div id="related-wrapper"></div>`;
+    // if tutorial -> parse quiz
+    const isTutorial = (issue.labels||[]).some(l=>l.name.toLowerCase()==='tutorial');
+    if(isTutorial) parseAndRenderQuiz(issue.body);
+    // related posts by first label
+    const primaryLabel = (issue.labels||[])[0] ? (issue.labels[0].name) : null;
+    if(primaryLabel) loadRelated(primaryLabel, issue.number);
+  }
 
-    <!-- Main Container -->
-    <main class="container">
-        <section class="page-header">
-            <h1 id="post-title">Loading...</h1>
-        </section>
-
-        <section id="post-content" class="post-grid">
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
-                </div>
-            </article>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="site-footer">
-        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
-    </footer>
-
-    <!-- JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const GITHUB_USERNAME = 'vampiresquad';
-            const GITHUB_REPONAME = 'vampire-blog';
-            const postContainer = document.getElementById('post-content');
-            const postTitle = document.getElementById('post-title');
-            const progressBar = document.getElementById('reading-progress');
-
-            // --- Get Issue ID from URL ---
-            const params = new URLSearchParams(window.location.search);
-            const postId = params.get('id');
-            if(!postId){
-                postContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;">No post ID provided!</p>`;
-                return;
-            }
-
-            // --- Fetch Single Post ---
-            async function fetchPost() {
-                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues/${postId}`;
-                try {
-                    const response = await fetch(apiUrl);
-                    if(!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-                    const post = await response.json();
-
-                    // Set Title
-                    postTitle.textContent = post.title;
-
-                    // Post Date & Author
-                    const postDate = new Date(post.created_at).toLocaleDateString('en-US', {
-                        year:'numeric', month:'long', day:'numeric'
-                    });
-                    const metaHTML = `<div class="post-meta">Posted by ${post.user.login} on ${postDate}</div>`;
-
-                    // Tags
-                    let tagsHTML = '';
-                    post.labels.forEach(label=>{
-                        const exclude = ['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'];
-                        if(!exclude.includes(label.name.toLowerCase())){
-                            tagsHTML += `<span class="post-tag" style="background-color:#${label.color}30;color:#${label.color};">${label.name}</span>`;
-                        }
-                    });
-                    tagsHTML = `<div class="post-tags">${tagsHTML}</div>`;
-
-                    // Body Content
-                    let bodyHTML = `<div class="post-body">${post.body.replace(/\n/g,'<br>')}</div>`;
-
-                    // Check for Tutorial Quiz
-                    if(post.labels.some(l=>l.name.toLowerCase()==='tutorial')){
-                        const quizHTML = parseQuiz(post.body);
-                        bodyHTML += quizHTML;
-                    }
-
-                    // Render Post
-                    postContainer.innerHTML = `
-                        <article class="post-card fade-in">
-                            <div class="post-card-content">
-                                ${metaHTML}
-                                ${tagsHTML}
-                                ${bodyHTML}
-                            </div>
-                        </article>
-                    `;
-
-                } catch(err){
-                    console.error('Error fetching post:', err);
-                    postContainer.innerHTML = `<p style="text-align:center;color:#ff4d4d;grid-column:1/-1;">Failed to load post. ${err.message}</p>`;
-                }
-            }
-
-            // --- Parse Quiz --- 
-            function parseQuiz(body){
-                const quizStart = body.indexOf('---QUIZ---');
-                const quizEnd = body.indexOf('---ENDQUIZ---');
-                if(quizStart===-1 || quizEnd===-1) return '';
-                const quizContent = body.substring(quizStart + 10, quizEnd).trim();
-                const lines = quizContent.split('\n').filter(l=>l.trim()!=='');
-                let html = `<div class="quiz-container"><h3>Quiz</h3>`;
-                lines.forEach((line,i)=>{
-                    const [q,a] = line.split('||'); // Format: Question||Answer
-                    if(q && a){
-                        html += `
-                        <div class="quiz-question">
-                            <p>${i+1}. ${q.trim()}</p>
-                            <input type="text" class="quiz-input" data-answer="${a.trim()}">
-                            <button class="quiz-check">Check</button>
-                            <span class="quiz-result"></span>
-                        </div>`;
-                    }
-                });
-                html += `</div>`;
-                return html;
-            }
-
-            // --- Quiz Event Listener ---
-            document.addEventListener('click', e=>{
-                if(e.target.classList.contains('quiz-check')){
-                    const container = e.target.closest('.quiz-question');
-                    const input = container.querySelector('.quiz-input');
-                    const result = container.querySelector('.quiz-result');
-                    if(input.value.trim().toLowerCase() === input.dataset.answer.toLowerCase()){
-                        result.textContent = '✅ Correct!';
-                        result.style.color = 'var(--primary-color)';
-                    } else {
-                        result.textContent = '❌ Wrong!';
-                        result.style.color = '#ff4d4d';
-                    }
-                }
+  // robust quiz parser: supports two formats:
+  // Format A:
+  // ---QUIZ---
+  // Question 1: text
+  // a) optionA
+  // b) optionB
+  // c) optionC
+  // d) optionD
+  // Answer: b
+  // ---ENDQUIZ---
+  // Format B:
+  // ---QUIZ---
+  // Q: text | A:opt1,B:opt2,C:opt3,D:opt4 | CORRECT:opt2
+  // ---ENDQUIZ---
+  function parseAndRenderQuiz(body){
+    const qMatch = body.match(/---QUIZ---([\s\S]*?)---ENDQUIZ---/i);
+    if(!qMatch) return;
+    const block = qMatch[1].trim();
+    const wrapper = document.getElementById('quiz-wrapper');
+    const quizContainer = document.createElement('div');
+    quizContainer.className = 'quiz-container';
+    quizContainer.innerHTML = `<h3>Quiz</h3>`;
+    // split by blank line between questions OR by "Question" prefixes
+    const parts = block.split(/\n{2,}|(?=Question\s+\d+:)/i).map(p=>p.trim()).filter(p=>p);
+    let qIndex = 0;
+    const total = parts.length;
+    parts.forEach(part=>{
+      qIndex++;
+      // try to detect lines
+      const lines = part.split(/\n/).map(l=>l.trim()).filter(Boolean);
+      // find question text
+      let qText = lines[0].replace(/^Question\s*\d+:\s*/i,'').replace(/^Q:\s*/i,'').trim();
+      // collect options
+      let opts = [], correct = null;
+      // scan for lines starting with a), b) etc or like "a) Option"
+      lines.slice(1).forEach(l=>{
+        const m = l.match(/^[a-d]\)\s*(.+)$/i);
+        if(m) opts.push(m[1].trim());
+      });
+      // if no opts parsed like that, try comma-separated in an Answer line or A:B:
+      if(opts.length===0){
+        // try parse a line that looks like: A:opt1,B:opt2,...
+        lines.slice(1).forEach(l=>{
+          if(/[A-D]:/i.test(l)){
+            l.split(',').forEach(seg=>{
+              const mm = seg.match(/[A-D]:\s*(.+)/i);
+              if(mm) opts.push(mm[1].trim());
             });
-
-            // --- Reading Progress ---
-            window.addEventListener('scroll', ()=>{
-                const scrollTop = window.scrollY;
-                const docHeight = document.body.scrollHeight - window.innerHeight;
-                const scrolled = (scrollTop / docHeight) * 100;
-                progressBar.style.width = scrolled + "%";
-            });
-
-            // --- Init ---
-            fetchPost();
+          }
         });
-    </script>
+      }
+      // find answer line
+      let aLine = lines.find(l=>/^Answer:/i.test(l) || /^CORRECT:/i.test(l) || /^Correct:/i.test(l));
+      if(aLine){
+        const m = aLine.match(/^Answer:\s*([a-dA-D])$/i);
+        if(m && opts.length>0){
+          const idx = m[1].toLowerCase().charCodeAt(0)-97;
+          correct = opts[idx];
+        }else{
+          const m2 = aLine.split(':').slice(1).join(':').trim();
+          if(m2) correct = m2;
+        }
+      } else {
+        // try if last line equals one of options
+        if(lines.length>1){
+          const last = lines[lines.length-1];
+          if(opts.includes(last)) correct = last;
+        }
+      }
+      // fallback: if only two lines, second is answer
+      if(!correct && lines.length===2 && opts.length===0) correct = lines[1];
 
-    <style>
-        /* Quiz Styles */
-        .quiz-container{
-            background: var(--card-background);
-            border:1px solid var(--border-color);
-            padding:1.5rem;
-            margin-top:1.5rem;
-            border-radius: var(--border-radius);
-        }
-        .quiz-question{
-            margin-bottom:1rem;
-        }
-        .quiz-input{
-            padding:0.5rem;
-            width:70%;
-            margin-right:0.5rem;
-            border-radius:6px;
-            border:1px solid var(--border-color);
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        .quiz-check{
-            padding:0.5rem 1rem;
-            border:none;
-            background: var(--primary-color);
-            color:#0d1117;
-            font-weight:600;
-            border-radius:6px;
-            cursor:pointer;
-        }
-        .quiz-check:hover{
-            background: var(--secondary-color);
-        }
-        .quiz-result{
-            margin-left:1rem;
-            font-weight:600;
-        }
+      // if still no explicit options, try parse inline options after question separated by '|'
+      if(opts.length===0 && /\|/.test(qText)){
+        const segs = qText.split('|').map(s=>s.trim());
+        qText = segs[0];
+        opts = segs.slice(1);
+      }
 
-        /* Fade-in Animation */
-        .fade-in{ animation: fadeInUp 0.6s ease forwards; opacity:0; }
-        @keyframes fadeInUp{
-            from{ transform: translateY(20px); opacity:0; }
-            to{ transform: translateY(0); opacity:1; }
-        }
-    </style>
+      // if opts still empty -> nothing to render
+      if(opts.length===0){
+        // render a simple input-answer style
+        const qDiv = document.createElement('div');
+        qDiv.className='quiz-question';
+        qDiv.innerHTML = `<p>${qIndex}. ${qText}</p>
+          <input class="quiz-input" data-answer="${(correct||'').replace(/"/g,'&quot;')}" placeholder="Type answer here">
+          <button class="quiz-check">Check</button>
+          <span class="quiz-result"></span>`;
+        quizContainer.appendChild(qDiv);
+        return;
+      }
 
+      // randomize options
+      const shuffled = shuffle(opts.slice());
+      // build options UI
+      const qDiv = document.createElement('div');
+      qDiv.className='quiz-question';
+      qDiv.innerHTML = `<p>${qIndex}. ${qText}</p>`;
+      const optsWrap = document.createElement('div');
+      optsWrap.className = 'quiz-options';
+      shuffled.forEach(opt=>{
+        const b = document.createElement('button');
+        b.className='quiz-option';
+        b.textContent = opt;
+        b.addEventListener('click', ()=>{
+          // disable siblings
+          Array.from(optsWrap.children).forEach(ch=>ch.disabled=true);
+          // mark
+          if(opt === correct){
+            b.classList.add('correct');
+          } else {
+            b.classList.add('wrong');
+            // highlight correct
+            Array.from(optsWrap.children).forEach(ch=>{
+              if(ch.textContent === correct) ch.classList.add('correct');
+            });
+          }
+          // show score snippet
+          const res = document.createElement('div'); res.className='quiz-result';
+          res.textContent = `Answer: ${correct ? correct : '—'}`;
+          qDiv.appendChild(res);
+        });
+        optsWrap.appendChild(b);
+      });
+      qDiv.appendChild(optsWrap);
+      quizContainer.appendChild(qDiv);
+    });
+
+    wrapper.appendChild(quizContainer);
+    // helper
+    function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
+  }
+
+  async function loadRelated(label, currentNumber){
+    try{
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?labels=${encodeURIComponent(label)}&state=open&per_page=5`);
+      if(!res.ok) return;
+      const list = await res.json();
+      const wrapper = document.getElementById('related-wrapper');
+      let html = '<div style="margin-top:20px"><h3>Related posts</h3>';
+      list.forEach(item=>{
+        if(item.number==currentNumber) return;
+        html += `<div style="margin-top:8px"><a href="post.html?id=${item.number}">${item.title}</a></div>`;
+      });
+      html += '</div>';
+      wrapper.innerHTML = html;
+    }catch(e){ console.error(e) }
+  }
+
+  // reading progress
+  window.addEventListener('scroll', ()=>{
+    const total = document.body.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / total) * 100;
+    document.getElementById('reading-progress').style.width = pct + '%';
+  });
+
+  fetchPost();
+})();
+</script>
 </body>
 </html>
