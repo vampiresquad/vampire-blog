@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vampire's Media Hub - Live News</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .news-card {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .news-card:hover { transform: translateY(-5px); }
+    .news-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .news-content { padding: 1rem; }
+    .news-content h3 {
+      font-size: 1.2rem;
+      color: var(--heading-color);
+      margin-bottom: 0.5rem;
+    }
+    .news-content p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .news-content a {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="news.html" class="active">News</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="page-header">
+      <h1>Live News Feed 📰</h1>
+      <p>Automatically fetched using NewsAPI</p>
+    </section>
+
+    <section id="news-container" class="news-grid">
+      <p>Loading latest headlines...</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 - Vampire's Media Hub. Powered by <a href="https://newsapi.org">NewsAPI</a>.</p>
+  </footer>
+
+  <script>
+    const API_KEY = "343cd143ed184c4b80190494583ec5de";
+    const newsContainer = document.getElementById("news-container");
+
+    async function loadNews() {
+      const url = `https://newsapi.org/v2/top-headlines?country=us&category=technology&apiKey=${API_KEY}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.status !== "ok") throw new Error("API Error");
+
+        newsContainer.innerHTML = "";
+
+        data.articles.forEach(article => {
+          const card = `
+            <div class="news-card">
+              <img src="${article.urlToImage || 'https://via.placeholder.com/400x200'}" alt="">
+              <div class="news-content">
+                <h3>${article.title}</h3>
+                <p>${article.description || 'No description available.'}</p>
+                <a href="${article.url}" target="_blank">Read More →</a>
+              </div>
+            </div>
+          `;
+          newsContainer.innerHTML += card;
+        });
+      } catch (err) {
+        newsContainer.innerHTML = `<p style="color:red;">Failed to load news: ${err.message}</p>`;
+      }
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>
