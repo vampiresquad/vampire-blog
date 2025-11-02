@@ -1,163 +1,107 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampire's Media Hub - Category</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Vampire's Media Hub - Category</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="reading-progress"></div>
 
-    <!-- Reading Progress -->
-    <div id="reading-progress"></div>
+  <header class="site-header">
+    <div class="container nav-container">
+      <a class="logo" href="index.html">Vampire<span>'s</span> Hub</a>
+      <nav class="main-nav">
+        <a href="index.html">Home</a>
+        <a href="search.html">Search</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </header>
 
-    <!-- Header -->
-    <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
-            <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="search.html">Search</a>
-            </nav>
-        </div>
-    </header>
+  <main class="container">
+    <section class="page-header"><h1 id="category-title">Category</h1></section>
+    <section class="post-grid" id="post-container">
+      <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton-line h-20 skeleton"></div><div class="skeleton-line h-12 skeleton"></div></div></article>
+      <article class="skeleton-card"><div class="skeleton-card-content"><div class="skeleton-line h-20 skeleton"></div><div class="skeleton-line h-12 skeleton"></div></div></article>
+    </section>
+  </main>
 
-    <main class="container">
-        <section class="page-header">
-            <h1 id="category-title">Category</h1>
-        </section>
+  <footer class="site-footer"><p>&copy; 2025 Vampire's Media Hub</p></footer>
 
-        <section class="post-grid" id="post-container">
-            <!-- Initial Skeleton Loader -->
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
-                </div>
-            </article>
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
-                </div>
-            </article>
-        </section>
-    </main>
+  <script>
+  (function(){
+    const GITHUB_USERNAME = 'vampiresquad';
+    const GITHUB_REPONAME = 'vampire-blog';
+    const PER_PAGE = 8;
+    const params = new URLSearchParams(window.location.search);
+    const label = params.get('label') || '';
+    document.getElementById('category-title').textContent = label ? label.replace(/-/g,' ') : 'All';
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
-    </footer>
+    const container = document.getElementById('post-container');
+    let page = 1, loading=false, exhausted=false;
 
-    <!-- JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const GITHUB_USERNAME = 'vampiresquad';
-            const GITHUB_REPONAME = 'vampire-blog';
-            const POSTS_PER_PAGE = 9;
-
-            const postContainer = document.getElementById('post-container');
-            const categoryTitle = document.getElementById('category-title');
-            const progressBar = document.getElementById('reading-progress');
-
-            let page = 1;
-            let isLoading = false;
-            let hasMore = true;
-
-            // --- Get Label from URL ---
-            const params = new URLSearchParams(window.location.search);
-            const label = params.get('label') || 'general';
-            categoryTitle.textContent = label.charAt(0).toUpperCase() + label.slice(1);
-
-            // --- Fetch Posts ---
-            async function fetchPosts() {
-                if(isLoading || !hasMore) return;
-                isLoading = true;
-
-                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&labels=${label}&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}&page=${page}`;
-
-                try {
-                    const response = await fetch(apiUrl);
-                    if(!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-                    const issues = await response.json();
-
-                    if(issues.length < POSTS_PER_PAGE) hasMore = false;
-
-                    if(page === 1) postContainer.innerHTML = '';
-                    if(issues.length === 0 && page === 1){
-                        postContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;">No posts found for "${label}"</p>`;
-                    }
-
-                    issues.forEach(issue => {
-                        const postCard = document.createElement('div');
-                        postCard.innerHTML = createPostCard(issue);
-                        postCard.classList.add('fade-in');
-                        postContainer.appendChild(postCard.firstElementChild);
-                    });
-
-                    page++;
-                    isLoading = false;
-                } catch(err) {
-                    console.error('Error fetching posts:', err);
-                    postContainer.innerHTML = `<p style="text-align:center;color:#ff4d4d;grid-column:1/-1;">Failed to load posts. ${err.message}</p>`;
-                }
-            }
-
-            // --- Create Post Card ---
-            function createPostCard(issue){
-                const postDate = new Date(issue.created_at).toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
-                const snippet = issue.body ? issue.body.substring(0,150)+'...' : 'No description available.';
-                let tagsHTML = '';
-                issue.labels.forEach(label=>{
-                    const exclude = ['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'];
-                    if(!exclude.includes(label.name.toLowerCase())){
-                        tagsHTML += `<span class="post-tag" style="background-color:#${label.color}30;color:#${label.color};">${label.name}</span>`;
-                    }
-                });
-                return `
-                    <article class="post-card">
-                        <div class="post-card-content">
-                            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
-                            <div class="post-meta">Posted by ${issue.user.login} on ${postDate}</div>
-                            <div class="post-tags">${tagsHTML}</div>
-                            <p class="post-excerpt">${snippet}</p>
-                            <a href="post.html?id=${issue.number}" class="read-more">Read More →</a>
-                        </div>
-                    </article>
-                `;
-            }
-
-            // --- Infinite Scroll ---
-            window.addEventListener('scroll', () => {
-                const scrollTop = window.scrollY;
-                const docHeight = document.body.scrollHeight - window.innerHeight;
-                const scrolled = (scrollTop / docHeight) * 100;
-                progressBar.style.width = scrolled + "%";
-
-                if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 300){
-                    fetchPosts();
-                }
-            });
-
-            // --- Init ---
-            fetchPosts();
-        });
-    </script>
-
-    <style>
-        /* Fade-in Animation */
-        .fade-in { animation: fadeInUp 0.6s ease forwards; opacity:0; }
-        @keyframes fadeInUp {
-            from { transform:translateY(20px); opacity:0; }
-            to { transform:translateY(0); opacity:1; }
+    async function fetchPosts(){
+      if(loading||exhausted) return;
+      loading=true;
+      const api = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&labels=${encodeURIComponent(label)}&sort=created&direction=desc&per_page=${PER_PAGE}&page=${page}`;
+      try{
+        const res = await fetch(api);
+        if(!res.ok) throw new Error(res.statusText);
+        const list = await res.json();
+        if(page===1) container.innerHTML='';
+        if(!Array.isArray(list) || list.length===0){
+          exhausted=true;
+          if(page===1) container.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#ff6b6b">No posts in ${label}</p>`;
+          loading=false; return;
         }
-    </style>
+        list.forEach(issue=>{
+          const el = document.createElement('div');
+          el.innerHTML = createPostCard(issue);
+          el.firstElementChild.classList.add('fade-in');
+          container.appendChild(el.firstElementChild);
+        });
+        if(list.length<PER_PAGE) exhausted=true;
+        page++;
+      }catch(e){
+        console.error(e);
+        if(page===1) container.innerHTML=`<p style="grid-column:1/-1;text-align:center;color:#ff6b6b">Failed to load posts.</p>`;
+      }
+      loading=false;
+    }
+
+    function createPostCard(issue){
+      const date = new Date(issue.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+      const snippet = issue.body? issue.body.slice(0,160).replace(/[\r\n]+/g,' ') + '...' : 'No description';
+      let tags='';
+      (issue.labels||[]).forEach(l=>{
+        if(!['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'].includes(l.name.toLowerCase())) tags += `<span class="post-tag">${l.name}</span>`;
+      });
+      return `
+        <article class="post-card">
+          <div class="post-card-content">
+            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
+            <div class="post-meta">${date} • ${issue.user.login}</div>
+            <div class="post-tags">${tags}</div>
+            <p class="post-excerpt">${snippet}</p>
+            <a class="read-more" href="post.html?id=${issue.number}">Read More →</a>
+          </div>
+        </article>
+      `;
+    }
+
+    // infinite scroll
+    window.addEventListener('scroll', ()=>{
+      if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 220) fetchPosts();
+      // progress
+      const total = document.body.scrollHeight - window.innerHeight;
+      const pct = (window.scrollY/total)*100;
+      document.getElementById('reading-progress').style.width = pct + '%';
+    });
+
+    fetchPosts();
+  })();
+  </script>
 </body>
 </html>
