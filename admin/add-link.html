@@ -1,0 +1,69 @@
+<!-- admin/add-link.html -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Add Link</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  .admin-wrap{max-width:900px;margin:30px auto;padding:18px;background:var(--card);border-radius:12px;border:1px solid var(--border)}
+  input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);margin-top:8px}
+  button{padding:10px 14px;border-radius:8px;border:none;background:var(--primary-color);color:#0d1117;font-weight:700;cursor:pointer;margin-top:10px}
+</style>
+</head>
+<body>
+  <header class="site-header"><div class="container nav-container"><a class="logo" href="../index.html">Vampire<span>'s</span> Hub</a></div></header>
+  <main class="container">
+    <div class="admin-wrap">
+      <h2>Admin — Fetch Article & Create Issue</h2>
+      <p>Paste article URL, choose label (news-world, tutorial, etc.). This will trigger the GitHub Actions workflow that fetches the article, converts to Markdown and creates an Issue.</p>
+
+      <input id="url" placeholder="Article URL (https://...)" />
+      <select id="label">
+        <option value="news-world">news-world</option>
+        <option value="news-country">news-country</option>
+        <option value="hacking">hacking</option>
+        <option value="tutorial">tutorial</option>
+        <option value="education">education</option>
+        <option value="personal">personal</option>
+      </select>
+      <input id="title" placeholder="Optional: Issue title (leave blank to auto use article title)"/>
+      <button id="run">Run Fetch & Create Issue</button>
+      <p style="color:var(--muted);margin-top:10px">Important: This action requires a GitHub Personal Access Token (PAT) with <code>repo</code> scope stored as a secret named <strong>ACTIONS_TRIGGER_PAT</strong> in this repository. If you prefer, run the workflow manually from GitHub Actions UI and paste the URL there.</p>
+      <div id="result" style="margin-top:12px"></div>
+    </div>
+  </main>
+
+<script>
+document.getElementById('run').addEventListener('click', async ()=>{
+  const url = document.getElementById('url').value.trim();
+  const label = document.getElementById('label').value;
+  const title = document.getElementById('title').value.trim();
+  if(!url) return alert('Paste a URL');
+  // trigger GitHub Actions workflow_dispatch via REST API
+  // requires a PAT stored as secret and available here via server proxy OR you can run via curl from your machine.
+  const repo = 'vampiresquad/vampire-blog';
+  const workflow_id = 'create-article.yml'; // the workflow filename
+  const token = prompt('Paste your GitHub PAT (will NOT be saved):');
+  if(!token) return alert('PAT required to trigger workflow');
+  const api = `https://api.github.com/repos/${repo}/actions/workflows/${workflow_id}/dispatches`;
+  const body = { ref: 'main', inputs: { url, label, 'issue-title': title } };
+  document.getElementById('result').innerText = 'Triggering workflow...';
+  try{
+    const res = await fetch(api, {
+      method:'POST',
+      headers:{ 'Authorization':'token '+token, 'Content-Type':'application/json', 'Accept':'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    if(res.status===204){
+      document.getElementById('result').innerHTML = 'Workflow triggered successfully — check GitHub Actions logs.';
+    } else {
+      const txt = await res.text();
+      document.getElementById('result').innerText = 'Failed: ' + res.status + ' ' + txt;
+    }
+  }catch(e){ document.getElementById('result').innerText = 'Error: ' + e.message }
+});
+</script>
+</body>
+</html>
