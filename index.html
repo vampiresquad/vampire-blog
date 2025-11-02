@@ -1,170 +1,198 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampire's Media Hub - Home</title>
-    
-    <meta name="description" content="Vampire's Media Hub - A collection of tech, science, news, entertainment, and personal thoughts.">
-    <meta name="keywords" content="Vampire, Blog, Tech, Hacking, AI, News, Education, Philosophy">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Vampire's Media Hub - Home</title>
+  <meta name="description" content="Vampire's Media Hub - Tech, Science, News, Entertainment, and Thoughts.">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="reading-progress"></div>
 
-    <!-- Reading Progress Bar -->
-    <div id="reading-progress"></div>
+  <header class="site-header">
+    <div class="container nav-container">
+      <a class="logo" href="index.html">Vampire<span>'s</span> Hub</a>
+      <nav class="main-nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="search.html">Search</a>
+        <a href="about.html">About</a>
+        <a href="admin/add-link.html">Admin</a>
+      </nav>
+    </div>
+  </header>
 
-    <!-- Header -->
-    <header class="site-header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Vampire<span>'s</span> Hub</a>
-            <nav class="main-nav">
-                <a href="index.html" class="active">Home</a>
-                <a href="about.html">About</a>
-                <a href="search.html">Search</a>
-            </nav>
+  <main class="container">
+    <section class="page-header">
+      <h1>Browse by Category</h1>
+    </section>
+
+    <section class="category-grid">
+      <a href="category.html?label=hacking" class="category-card"><h3>Hacking</h3></a>
+      <a href="category.html?label=ai" class="category-card"><h3>AI</h3></a>
+      <a href="category.html?label=science" class="category-card"><h3>Science</h3></a>
+      <a href="category.html?label=tutorial" class="category-card"><h3>Tutorials</h3></a>
+      <a href="category.html?label=education" class="category-card"><h3>Education</h3></a>
+      <a href="category.html?label=news-world" class="category-card"><h3>World News</h3></a>
+      <a href="category.html?label=news-country" class="category-card"><h3>Country News</h3></a>
+      <a href="category.html?label=movies" class="category-card"><h3>Movies</h3></a>
+      <a href="category.html?label=music" class="category-card"><h3>Music</h3></a>
+      <a href="category.html?label=games" class="category-card"><h3>Games</h3></a>
+      <a href="category.html?label=personal" class="category-card"><h3>Personal Blog</h3></a>
+      <a href="category.html?label=religious" class="category-card"><h3>Religious</h3></a>
+      <a href="category.html?label=philosophy" class="category-card"><h3>Philosophy</h3></a>
+    </section>
+
+    <section style="margin-top:28px" class="page-header"><h1>Latest Posts</h1></section>
+
+    <section class="post-grid" id="post-container">
+      <!-- skeletons -->
+      <article class="skeleton-card">
+        <div class="skeleton-card-content">
+          <div class="skeleton-line h-20 skeleton"></div>
+          <div class="skeleton-line h-12 skeleton"></div>
+          <div class="skeleton-line h-16 skeleton"></div>
         </div>
-    </header>
+      </article>
+      <article class="skeleton-card">
+        <div class="skeleton-card-content">
+          <div class="skeleton-line h-20 skeleton"></div>
+          <div class="skeleton-line h-12 skeleton"></div>
+          <div class="skeleton-line h-16 skeleton"></div>
+        </div>
+      </article>
+      <article class="skeleton-card">
+        <div class="skeleton-card-content">
+          <div class="skeleton-line h-20 skeleton"></div>
+          <div class="skeleton-line h-12 skeleton"></div>
+          <div class="skeleton-line h-16 skeleton"></div>
+        </div>
+      </article>
+    </section>
 
-    <!-- Main Container -->
-    <main class="container">
+    <!-- Hybrid News System (RSS + NewsAPI) -->
+    <section id="vampire-news" class="news-section">
+      <h2>🩸 Vampire Squad Tech & Cyber News</h2>
+      <div id="rss-news"></div>
+      <div id="api-news"></div>
+    </section>
 
-        <!-- Category Grid -->
-        <section class="page-header">
-            <h1>Browse by Category</h1>
-        </section>
-        
-        <section class="category-grid">
-            <a href="category.html?label=hacking" class="category-card"><h3>Hacking</h3></a>
-            <a href="category.html?label=ai" class="category-card"><h3>AI</h3></a>
-            <a href="category.html?label=science" class="category-card"><h3>Science</h3></a>
-            <a href="category.html?label=tutorial" class="category-card"><h3>Tutorials</h3></a>
-            <a href="category.html?label=education" class="category-card"><h3>Education</h3></a>
-            <a href="category.html?label=news-world" class="category-card"><h3>World News</h3></a>
-            <a href="category.html?label=news-country" class="category-card"><h3>Country News</h3></a>
-            <a href="category.html?label=movies" class="category-card"><h3>Movies</h3></a>
-            <a href="category.html?label=music" class="category-card"><h3>Music</h3></a>
-            <a href="category.html?label=games" class="category-card"><h3>Games</h3></a>
-            <a href="category.html?label=personal" class="category-card"><h3>Personal Blog</h3></a>
-            <a href="category.html?label=religious" class="category-card"><h3>Religious</h3></a>
-            <a href="category.html?label=philosophy" class="category-card"><h3>Philosophy</h3></a>
-        </section>
+  </main>
 
-        <!-- Latest Posts -->
-        <section class="page-header" style="margin-top:3rem;">
-            <h1>Latest Posts</h1>
-        </section>
-        
-        <section class="post-grid" id="post-container">
-            <!-- Skeleton Loader -->
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
-                </div>
-            </article>
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
-                </div>
-            </article>
-            <article class="skeleton-card">
-                <div class="skeleton-card-content">
-                    <div class="skeleton skeleton-line h-20"></div>
-                    <div class="skeleton skeleton-line h-12"></div>
-                    <div class="skeleton skeleton-line h-16"></div>
-                    <div class="skeleton skeleton-line h-16-75"></div>
-                    <div class="skeleton skeleton-line h-16-50" style="margin-top:1rem;"></div>
-                </div>
-            </article>
-        </section>
+  <footer class="site-footer">
+    <p>&copy; 2025 Vampire's Media Hub — Vampire Squad</p>
+  </footer>
 
-    </main>
+  <!-- Scripts -->
+  <script>
+  // config
+  const GITHUB_USERNAME = 'vampiresquad';
+  const GITHUB_REPONAME = 'vampire-blog';
+  const POSTS_PER_PAGE = 9;
+  const postContainer = document.getElementById('post-container');
+  const progressBar = document.getElementById('reading-progress');
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <p>&copy; 2025 - Vampire's Media Hub. All rights reserved.</p>
-    </footer>
+  async function fetchPosts(){
+    const api = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}`;
+    try{
+      const res = await fetch(api);
+      if(!res.ok) throw new Error(res.status + ' ' + res.statusText);
+      const issues = await res.json();
+      postContainer.innerHTML = '';
+      if(!issues || issues.length===0){ postContainer.innerHTML = '<p style="grid-column:1/-1;text-align:center">No posts yet.</p>'; return; }
+      issues.forEach(issue=>{
+        postContainer.innerHTML += createPostCard(issue);
+      });
+    }catch(err){
+      console.error(err);
+      postContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#ff6b6b">Failed to load posts. ${err.message}</p>`;
+    }
+  }
 
-    <!-- JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+  function createPostCard(issue){
+    const date = new Date(issue.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const snippet = issue.body ? issue.body.slice(0,160).replace(/[\r\n]+/g,' ') + '...' : 'No description';
+    let tagsHTML = '';
+    (issue.labels||[]).forEach(l=>{
+      if(!['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'].includes(l.name.toLowerCase())){
+        tagsHTML += `<span class="post-tag">${l.name}</span>`;
+      }
+    });
+    return `
+      <article class="post-card fade-in">
+        <div class="post-card-content">
+          <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
+          <div class="post-meta">Posted by ${issue.user.login} • ${date}</div>
+          <div class="post-tags">${tagsHTML}</div>
+          <p class="post-excerpt">${snippet}</p>
+          <a class="read-more" href="post.html?id=${issue.number}">Read More →</a>
+        </div>
+      </article>
+    `;
+  }
 
-            // --- Config ---
-            const GITHUB_USERNAME = 'vampiresquad';
-            const GITHUB_REPONAME = 'vampire-blog';
-            const POSTS_PER_PAGE = 9;
+  // reading progress
+  window.addEventListener('scroll', ()=>{
+    const total = document.body.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / total) * 100;
+    progressBar.style.width = pct + '%';
+  });
 
-            const postContainer = document.getElementById('post-container');
-            const progressBar = document.getElementById('reading-progress');
+  fetchPosts();
+  </script>
 
-            // --- Fetch Latest Posts from GitHub ---
-            async function fetchPosts() {
-                const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPONAME}/issues?state=open&sort=created&direction=desc&per_page=${POSTS_PER_PAGE}`;
-                try {
-                    const response = await fetch(apiUrl);
-                    if(!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-                    const issues = await response.json();
+  <!-- Hybrid news scripts (RSS + NewsAPI) -->
+  <script src="https://unpkg.com/rss-parser/dist/rss-parser.min.js"></script>
+  <script>
+  (function(){
+    const parser = new RSSParser();
+    const rssFeeds = [
+      "https://feeds.bbci.co.uk/news/technology/rss.xml",
+      "https://www.wired.com/feed/rss",
+      "https://www.theverge.com/rss/index.xml"
+    ];
 
-                    postContainer.innerHTML = '';
-                    if(issues.length === 0){
-                        postContainer.innerHTML = '<p style="grid-column:1/-1;text-align:center;">No posts found yet. Create a new Issue to get started!</p>';
-                        return;
-                    }
+    async function loadRSS(){
+      let html = "<h3>🔗 From Tech Feeds</h3>";
+      for(const feed of rssFeeds){
+        try{
+          const f = await parser.parseURL(feed);
+          f.items.slice(0,3).forEach(item=>{
+            html += `<div class="news-item"><a href="${item.link}" target="_blank">${item.title}</a><p>${item.contentSnippet||''}</p></div>`;
+          });
+        }catch(err){
+          console.error('rss',err);
+        }
+      }
+      document.getElementById('rss-news').innerHTML = html;
+    }
 
-                    issues.forEach(issue => {
-                        postContainer.innerHTML += createPostCard(issue);
-                    });
-
-                } catch(err) {
-                    console.error('Error fetching posts:', err);
-                    postContainer.innerHTML = `<p style="text-align:center;color:#ff4d4d;grid-column:1/-1;">Failed to load posts. ${err.message}</p>`;
-                }
-            }
-
-            // --- Create Post Card HTML ---
-            function createPostCard(issue){
-                const postDate = new Date(issue.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-                const snippet = issue.body ? issue.body.substring(0,150) + '...' : 'No description available.';
-                let tagsHTML = '';
-                issue.labels.forEach(label=>{
-                    const excludeLabels = ['bug','documentation','duplicate','enhancement','good first issue','help wanted','invalid','question','wontfix'];
-                    if(!excludeLabels.includes(label.name.toLowerCase())){
-                        tagsHTML += `<span class="post-tag" style="background-color:#${label.color}30;color:#${label.color};">${label.name}</span>`;
-                    }
-                });
-                return `
-                    <article class="post-card">
-                        <div class="post-card-content">
-                            <h2><a href="post.html?id=${issue.number}">${issue.title}</a></h2>
-                            <div class="post-meta">Posted by ${issue.user.login} on ${postDate}</div>
-                            <div class="post-tags">${tagsHTML}</div>
-                            <p class="post-excerpt">${snippet}</p>
-                            <a href="post.html?id=${issue.number}" class="read-more">Read More →</a>
-                        </div>
-                    </article>
-                `;
-            }
-
-            // --- Reading Progress ---
-            window.addEventListener('scroll', () => {
-                const scrollTop = window.scrollY;
-                const docHeight = document.body.scrollHeight - window.innerHeight;
-                const scrolled = (scrollTop / docHeight) * 100;
-                progressBar.style.width = scrolled + "%";
-            });
-
-            // --- Init ---
-            fetchPosts();
+    async function loadAPI(){
+      const apiKey = "343cd143ed184c4b80190494583ec5de"; // your key
+      const q = encodeURIComponent('cybersecurity OR hacking OR technology');
+      const url = `https://newsapi.org/v2/everything?q=${q}&language=en&sortBy=publishedAt&pageSize=6&apiKey=${apiKey}`;
+      try{
+        const res = await fetch(url);
+        const data = await res.json();
+        if(!data.articles) { document.getElementById('api-news').innerHTML=''; return; }
+        let html = "<h3>📰 From News API</h3>";
+        data.articles.forEach(a=>{
+          html += `<div class="news-item"><a href="${a.url}" target="_blank">${a.title}</a><p>${a.description||''}</p>${a.urlToImage?`<img src="${a.urlToImage}" style="width:100%;border-radius:8px;margin-top:8px">`:''}</div>`;
         });
-    </script>
+        document.getElementById('api-news').innerHTML = html;
+      }catch(err){ console.error('newsapi',err); }
+    }
 
+    loadRSS();
+    loadAPI();
+    setInterval(()=>{ loadRSS(); loadAPI() }, 30*60*1000);
+  })();
+  </script>
+
+  <style>
+  /* small fade-in helper (page-level) */
+  .fade-in{animation:fadeInUp .6s ease both; opacity:0}
+  @keyframes fadeInUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+  </style>
 </body>
 </html>
